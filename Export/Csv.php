@@ -1,5 +1,5 @@
 <?php
-namespace samarth\ignou2022july\modules\admadmin\Export;
+namespace Export;
 
 use Yii;
 use yii\data\ActiveDataProvider;
