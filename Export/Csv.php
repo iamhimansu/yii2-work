@@ -1,5 +1,6 @@
 <?php
-namespace Export;
+
+namespace uims\examination\modules\examination\Export;
 
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -432,6 +433,10 @@ class Csv extends ActiveQuery
             if (empty($rows)) {
                 return;
             }
+            //Clean buffers
+            while (ob_get_level()) {
+                ob_end_clean();
+            };
             //If everything is fine download the file
             //Download header
             $this->downloadHeaders();
@@ -459,7 +464,7 @@ class Csv extends ActiveQuery
                                 $headers = array_merge($headers, [$this->enclose(trim($this->column_names_substitute[$field_name] ??
                                     (false !== strpos($field_name, '.') ?
                                         Inflector::titleize(substr($field_name, strpos($field_name, '.') + 1)) :
-                                        Inflector::titleize($field_name))))]);
+                                        Inflector::titleize($field_name))))]); //FIX withColumnNamesIn, currently sets all columns with inflector
                             } else {
                                 $headers = array_merge($headers, [$this->enclose($field_name)]);
                             }
@@ -565,14 +570,15 @@ class Csv extends ActiveQuery
      */
     protected function downloadHeaders($no_cache = true)
     {
+        while (ob_get_level()) {
+            ob_get_clean();
+        }
         //Clean previous buffers
         if (headers_sent()) {
             ob_flush();
             flush();
         }
-        if (ob_get_level()) {
-            ob_get_clean();
-        }
+
         if ($no_cache) {
             // rfc2616 - Section 14.21
             header('Expires: ' . gmdate(DATE_RFC1123));
@@ -602,37 +608,6 @@ class Csv extends ActiveQuery
         //UTF-8 BOM
         //Adds Byte Order mark characters in the buffer
         echo $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF));
-    }
-
-    public function getApproxTableData($db, $table_name)
-    {
-
-        $table_data = [];
-        $table_data['Name'] = '';
-        $table_data['Engine'] = '';
-        $table_data['Version'] = '';
-        $table_data['Row_format'] = '';
-        $table_data['Rows'] = '';
-        $table_data['Avg_row_length'] = '';
-        $table_data['Data_length'] = '';
-        $table_data['Max_data_length'] = '';
-        $table_data['Index_length'] = '';
-        $table_data['Data_free'] = '';
-        $table_data['Auto_increment'] = '';
-        $table_data['Create_time'] = '';
-        $table_data['Update_time'] = '';
-        $table_data['Check_time'] = '';
-        $table_data['Collation'] = '';
-        $table_data['Checksum'] = '';
-        $table_data['Create_options'] = '';
-        $table_data['Create_options'] = '';
-        $table_data['Comment'] = '';
-        try {
-            $table_data = $db->createCommand("SHOW TABLE STATUS WHERE NAME =" . $table_name)->queryOne();
-            return $table_data;
-        } catch (\Exception $e) {
-            return $table_data;
-        }
     }
 
     /**
@@ -689,11 +664,11 @@ class Csv extends ActiveQuery
     protected function outputBufferHandler($array_content)
     {
         //Clean previous buffers or errors
+        while (ob_get_level()) {
+            ob_end_clean();
+        };
         if (headers_sent()) {
             flush();
-        }
-        if (ob_get_level()) {
-            ob_get_clean();
         }
         $time_now = time();
 
@@ -733,6 +708,37 @@ class Csv extends ActiveQuery
                 return "\n***ERROR IN BUFFER***";
             }
             return "\n";
+        }
+    }
+
+    public function getApproxTableData($db, $table_name)
+    {
+
+        $table_data = [];
+        $table_data['Name'] = '';
+        $table_data['Engine'] = '';
+        $table_data['Version'] = '';
+        $table_data['Row_format'] = '';
+        $table_data['Rows'] = '';
+        $table_data['Avg_row_length'] = '';
+        $table_data['Data_length'] = '';
+        $table_data['Max_data_length'] = '';
+        $table_data['Index_length'] = '';
+        $table_data['Data_free'] = '';
+        $table_data['Auto_increment'] = '';
+        $table_data['Create_time'] = '';
+        $table_data['Update_time'] = '';
+        $table_data['Check_time'] = '';
+        $table_data['Collation'] = '';
+        $table_data['Checksum'] = '';
+        $table_data['Create_options'] = '';
+        $table_data['Create_options'] = '';
+        $table_data['Comment'] = '';
+        try {
+            $table_data = $db->createCommand("SHOW TABLE STATUS WHERE NAME =" . $table_name)->queryOne();
+            return $table_data;
+        } catch (\Exception $e) {
+            return $table_data;
         }
     }
 
