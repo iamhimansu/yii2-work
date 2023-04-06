@@ -5,9 +5,8 @@ Exports large data in csv, based on YII2
 
 ## uses:
 ```php
-    $export = new Csv();
+    $export = Csv::export("SELECT * FROM xyz");
     return $export
-                  ->export("SELECT * FROM xyz")
                   ->as('data.csv')
                   ->inChunksOf(1000)
                   ->start();
