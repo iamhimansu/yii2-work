@@ -1,4 +1,6 @@
-     $i = 0;
+    
+<?php 
+$i = 0;
         $reader = IOFactory::createReaderForFile($this->file);
         $htmlReader = new \PhpOffice\PhpSpreadsheet\Reader\Html();
         $reader->setReadDataOnly(true);
@@ -31,3 +33,5 @@
         echo "</pre>";
         die;
         die;
+
+?>
