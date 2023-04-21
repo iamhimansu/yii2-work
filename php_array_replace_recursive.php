@@ -1,4 +1,6 @@
-  class Merge {
+<?php
+
+class Merge {
     public function mergeConfigsDifference(&$config, $bluePrintArray)
     {
         foreach ($bluePrintArray as $key => $value) {
@@ -38,3 +40,6 @@ echo "</pre>";
 echo "<pre>";
 var_dump(array_replace_recursive($arr1, $arr2));
 echo "</pre>";
+
+
+?>
